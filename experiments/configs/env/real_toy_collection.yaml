@@ -7,7 +7,7 @@ dataset_generator_func:
   # episode_num_pertask: 10000 
   # env_names: ["RealRobotDrakeHammerforhammerEnv-Tool"]
   task_name: "toy collection"
-  dataset_dir: "/home/yunzhe/locoman_teleop/demonstrations/${domains}"
+  dataset_dir: "/home/yunzhe/Human2LocoMan/demonstrations/${domains}"
   action_name: ['actions/body', 'actions/eef', 'actions/gripper']
   observation_name: ['proprioceptions/body', 'proprioceptions/eef', 'proprioceptions/gripper', 'proprioceptions/eef_to_body']
   camera_names: ['main_left', 'main_right', 'wrist']
@@ -20,7 +20,7 @@ rollout_runner:
   save_video: True
 
 dataloader:
-  batch_size: 32
+  batch_size: 16
   num_workers: 1
   pin_memory: True
   persistent_workers: True
@@ -28,7 +28,7 @@ dataloader:
   drop_last: False
 
 val_dataloader:
-  batch_size: 32
+  batch_size: 16
   num_workers: 1
   shuffle: False
   pin_memory: True

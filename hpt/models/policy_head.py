@@ -12,7 +12,7 @@ from typing import  List
 from .transformer import CrossAttention
 import torch.distributions as dist
 
-LOSS = partial(F.smooth_l1_loss, beta=0.05)
+LOSS = partial(F.smooth_l1_loss, beta=0.05, reduction="none")
 INIT_CONST = 0.02
 
 
@@ -39,8 +39,13 @@ class PolicyHead(nn.Module):
 
     def compute_loss(self, x: torch.Tensor, data: dict):
         self.target_action = data["action"]
+        action_mask = data.get("action_mask", None)
         self.pred_action = self(x).view(self.target_action.shape)
-        return LOSS(self.pred_action, self.target_action)
+        all_loss = LOSS(self.pred_action, self.target_action)
+        if action_mask is not None:
+            all_loss = all_loss * action_mask.unsqueeze(1)
+        loss = all_loss.mean(dim=(0,1)).sum()
+        return loss
 
 
 

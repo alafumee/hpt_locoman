@@ -20,11 +20,16 @@ for arg in "${@:5}"; do
 done
 
 
-CMD="CUDA_VISIBLE_DEVICES=4 HYDRA_FULL_ERROR=1 time python -m hpt.run  \
+CMD="CUDA_VISIBLE_DEVICES=5 HYDRA_FULL_ERROR=1 time python -m hpt.run  \
 		script_name=$STAT_DIR \
 		env=real_toy_collection  \
 		train.pretrained_dir=output/$PRETRAINED  \
 		dataset.episode_cnt=100 \
+		train.total_iters=160000 \
+		dataloader.batch_size=32 \
+		val_dataloader.batch_size=32 \
+		optimizer.lr=1e-4 \
+		train.freeze_trunk=False \
 		domains=toy_collect_human \
 		output_dir=output/${DATE}_${PRETRAINEDCMD} \
 		$ADD_ARGUMENT"

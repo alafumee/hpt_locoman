@@ -204,6 +204,7 @@ class LocalTrajDataset:
 
         dataset_path = "data/zarr_" + self.dataset_name_withpostfix  # match RTX format
         load_from_cache = os.path.exists(dataset_path + "/data/action") and not regenerate
+        load_from_cache = False
         print(f"\n\n >>>dataset_path: {dataset_path} load_from_cache: {load_from_cache} \n\n")
 
         if use_disk or not os.path.exists(dataset_path):  # first time generation
@@ -406,7 +407,9 @@ class LocalTrajDataset:
                     sample[key] = val[:1]
                 else:
                     sample[key] = val[: self.observation_horizon]
-
+            elif key == 'action_mask':
+                # action mask
+                sample[key] = val[0]
             else:
                 # future actions
                 sample["action"] = val[

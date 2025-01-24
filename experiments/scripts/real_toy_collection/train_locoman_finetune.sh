@@ -9,13 +9,13 @@ echo "RUNNING $STAT_DIR!"
 PRETRAINED=${1}
 PRETRAINEDCMD=${2}
 NUM_RUN=${3-"1"}
-
+size=${4-"small"}
 
 # train
-ADD_ARGUMENT=${4-""}
+ADD_ARGUMENT=${5-""}
 
-# Loop through the arguments starting from the 5th
-for arg in "${@:5}"; do
+# Loop through the arguments starting from the 6th
+for arg in "${@:6}"; do
   ADD_ARGUMENT+=" $arg"  # Concatenate each argument
 done
 
@@ -25,7 +25,8 @@ CMD="CUDA_VISIBLE_DEVICES=4 HYDRA_FULL_ERROR=1 time python -m hpt.run  \
 		env=real_toy_collection  \
 		train.pretrained_dir=output/$PRETRAINED  \
 		dataset.episode_cnt=100 \
-		domains=train_robotonly_smaller \
+		train.freeze_trunk=False \
+		domains=train_toy_collect_locoman_${size} \
 		output_dir=output/${DATE}_${PRETRAINEDCMD} \
 		$ADD_ARGUMENT"
 

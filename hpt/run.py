@@ -17,7 +17,7 @@ import numpy as np
 
 MAX_EPOCHS = 100000
 TEST_FREQ = 3
-MODEL_SAVING_FREQ = 200
+MODEL_SAVING_FREQ = 6
 torch.backends.cudnn.benchmark = False
 torch.backends.cudnn.deterministic = True
 
@@ -115,10 +115,13 @@ def run(cfg):
 
     # init policy
     policy = init_policy(cfg, dataset, domain, device)
+    
+    print("total num of parameters: ", sum(p.numel() for p in policy.parameters() if p.requires_grad))
+    print("trunk parameters: ", sum(p.numel() for p in policy.trunk.parameters() if p.requires_grad))
 
     # optimizer and scheduler
     opt = utils.get_optimizer(cfg.optimizer, policy, cfg.optimizer_misc)
-    cfg.lr_scheduler.T_max = int(cfg.train.total_iters)
+    # cfg.lr_scheduler.T_max = int(cfg.train.total_iters)
     sch = utils.get_scheduler(cfg.lr_scheduler, optimizer=opt)
     sch = WarmupLR(sch, init_lr=0, num_warmup=cfg.warmup_lr.step, warmup_strategy="linear")
 
@@ -143,7 +146,9 @@ def run(cfg):
         if "loss" in train_stats:
             print(f"Steps: {train_steps}. Train loss: {train_stats['loss']:.4f}. Test loss: {test_loss:.4f}")
 
-        policy.save(policy_path)
+        # policy.save(policy_path)
+        if epoch % MODEL_SAVING_FREQ == 0 or train_steps > cfg.train.total_iters:
+            policy.save(os.path.join(cfg.output_dir, f"model_epoch_{epoch}.pth"))
         if train_steps > cfg.train.total_iters:
             break
 

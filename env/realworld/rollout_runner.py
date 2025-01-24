@@ -59,14 +59,18 @@ def find_all_hdf5(dataset_dir, skip_mirrored_data):
     print(f'Found {len(hdf5_files)} hdf5 files')
     return hdf5_files
 
-def convert_dataset_image(dataset_dir, task_name='toy_collection', action_name=['actions'], observation_name=['qpos'], camera_names=['main_left', 'main_right', 'wrist']):
+def convert_dataset_image(dataset_dir, task_name='toy_collection', action_name=['actions'], observation_name=['qpos'], camera_names=['main_left', 'main_right', 'wrist'], chunk_size=60):
     hdf5_files = sorted(find_all_hdf5(dataset_dir, skip_mirrored_data=True))
     for file_idx, hdf5_path in tqdm(enumerate(hdf5_files)):
         with h5py.File(hdf5_path, 'r') as root:
             action_data = []
+            action_mask_data = []
             for name in action_name:
                 action_data.append(root[f'/{name}'][()])
+                item_name = name.split('/')[-1]
+                action_mask_data.append(root[f'/masks/act_{item_name}'][()])
             action = np.concatenate(action_data, axis=-1)
+            action_mask = np.concatenate(action_mask_data, axis=-1)
             original_action_shape = action.shape
             episode_len = original_action_shape[0]
             # get observation at start_ts only
@@ -96,6 +100,7 @@ def convert_dataset_image(dataset_dir, task_name='toy_collection', action_name=[
                 step = {
                     "observation": obs_dict,
                     "action": action[idx],
+                    "action_mask": action_mask,
                     "language_instruction": lang,
                 }
                 steps.append(OrderedDict(step))
