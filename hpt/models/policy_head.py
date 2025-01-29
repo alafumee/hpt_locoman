@@ -41,6 +41,8 @@ class PolicyHead(nn.Module):
         self.target_action = data["action"]
         action_mask = data.get("action_mask", None)
         self.pred_action = self(x).view(self.target_action.shape)
+        # print('---PRED_ACTION---', self.pred_action[0])
+        # print('---TARGET_ACTION---', self.target_action[0])
         all_loss = LOSS(self.pred_action, self.target_action)
         if action_mask is not None:
             all_loss = all_loss * action_mask.unsqueeze(1)

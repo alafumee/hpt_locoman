@@ -37,8 +37,8 @@ def init_policy(cfg, dataset, domain, device):
 
     """
     # initialize policy and load pretrained model
-    pretrained_exists = len(cfg.train.pretrained_dir) > len("output/") and os.path.exists(
-        os.path.join(cfg.train.pretrained_dir, f"trunk.pth")
+    pretrained_exists = len(cfg.train.pretrained_dir) > len("output/") and (
+        os.path.exists(os.path.join(cfg.train.pretrained_dir, f"trunk.pth")) or os.path.exists(os.path.join(cfg.train.pretrained_dir, f"model.pth"))
     )
     if pretrained_exists:
         print("load pretrained trunk config")
@@ -59,7 +59,7 @@ def init_policy(cfg, dataset, domain, device):
 
     utils.update_network_dim(cfg, dataset, policy)
     policy.init_domain_stem(domain, cfg.stem)
-    normalizer = dataset.get_normalizer()
+    normalizer = dataset.get_normalizer(mode='gaussian') # TODO: original is default ('limits')
     policy.init_domain_head(domain, normalizer, cfg.head)
 
     # add encoders into policy parameters. enable end-to-end training of the viison model for instance.

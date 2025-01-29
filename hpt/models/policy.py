@@ -371,6 +371,15 @@ class Policy(nn.Module):
                 path = path.replace("output/", "")
             path = download_from_huggingface(path[len("hf://") :])
             self.trunk.load_state_dict(torch.load(path), strict=True)
+        else:
+            if not os.path.exists(path):
+                path = path.replace("trunk.pth", "model.pth")
+                loaded_model = torch.load(path)
+                print("loaded model keys:", loaded_model.keys())
+                loaded_trunk = {k[6:]: v for k, v in loaded_model.items() if k[:6] == 'trunk.'} # trunk.trunk.abc->trunk.abc
+                self.trunk.load_state_dict(loaded_trunk, strict=True)
+            else:
+                self.trunk.load_state_dict(torch.load(path), strict=True)
 
     def freeze_trunk(self, num_layers: int = 0):
         """ freeze the trunk parameters in the last num_layers """
@@ -399,6 +408,9 @@ class Policy(nn.Module):
         cfg.network["_target_"] = "hpt.models.policy.Policy"
         policy = hydra.utils.instantiate(cfg.network)
         policy.load_trunk(os.path.join(checkpoint_path, "trunk.pth"))
+        # print("---stem keys:", [key for key in policy.state_dict().keys() if 'stems' in key])
+        # print("---head keys:", [key for key in policy.state_dict().keys() if 'heads' in key])
+        print('---state dict', policy.state_dict().keys())
         return policy
 
     @classmethod
@@ -520,16 +532,22 @@ class Policy(nn.Module):
         if "prev_actions" in self.history_buffer:
             data_th["prev_actions"] = torch.cat(self.history_buffer["prev_actions"], dim=1).float()
 
-        if self.openloop_traj_step != self.action_horizon - 1:
-            # use previous predictions in open-loop execution
-            self.openloop_traj_step += 1
-        else:
-            action_th = self(domain, data_th)  # forward pass
-            self.action_traj = action_th.detach().cpu().numpy()[0]  # batch=1
-            self.action_traj = self.action_traj.reshape(-1, action_dim)  # T x Da
-            self.openloop_traj_step = 0  # reset steps
+        # if self.openloop_traj_step != self.action_horizon - 1:
+        #     # use previous predictions in open-loop execution
+        #     self.openloop_traj_step += 1
+        # else:
+        #     action_th = self(domain, data_th)  # forward pass
+        #     self.action_traj = action_th.detach().cpu().numpy()[0]  # batch=1
+        #     self.action_traj = self.action_traj.reshape(-1, action_dim)  # T x Da
+        #     self.openloop_traj_step = 0  # reset steps
 
-        # handle previous actions
-        curr_action = self.action_traj[self.openloop_traj_step]
-        update_history_buffer("prev_actions", torch.FloatTensor(curr_action)[None, None, None].to(device).float())
-        return curr_action
+        # # handle previous actions
+        # curr_action = self.action_traj[self.openloop_traj_step]
+        # update_history_buffer("prev_actions", torch.FloatTensor(curr_action)[None, None, None].to(device).float())
+        # return curr_action
+        
+        action_th = self(domain, data_th)  # forward pass
+        self.action_traj = action_th.detach().cpu().numpy()[0]  # batch=1
+        self.action_traj = self.action_traj.reshape(-1, action_dim)  # T x Da
+        
+        return self.action_traj

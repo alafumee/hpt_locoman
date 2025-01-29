@@ -20,9 +20,9 @@ for arg in "${@:6}"; do
 done
 
 
-CMD="CUDA_VISIBLE_DEVICES=6 HYDRA_FULL_ERROR=1 time python -m hpt.run  \
+CMD="CUDA_VISIBLE_DEVICES=5 HYDRA_FULL_ERROR=1 time python -m hpt.run  \
 		script_name=$STAT_DIR \
-		env=real_toy_collection  \
+		env=real_toy_collection_smallmodel  \
 		train.pretrained_dir=output/$PRETRAINED  \
 		dataset.episode_cnt=100 \
 		train.freeze_trunk=False \

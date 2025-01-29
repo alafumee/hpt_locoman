@@ -152,5 +152,5 @@ class SequenceSampler:
                 if sample_end_idx < self.sequence_length and len(sample) > 0:
                     data[sample_end_idx:] = sample[-1]
                 data[sample_start_idx:sample_end_idx] = sample
-            result[key] = data
+            result[key] = data  
         return result

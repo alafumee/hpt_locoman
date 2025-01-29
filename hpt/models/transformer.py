@@ -164,7 +164,7 @@ class BlockWithMasking(nn.Module):
         self,
         dim: int,
         attn_target: Callable,
-        mlp_ratio: int = 4,
+        mlp_ratio: int = 2,  # TODO: original is 4
         act_layer: Callable = nn.GELU,
         norm_layer: Callable = nn.LayerNorm,
         ffn_dropout_rate: float = 0.0,

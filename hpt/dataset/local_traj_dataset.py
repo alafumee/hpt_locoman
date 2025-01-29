@@ -123,7 +123,11 @@ def process_dataset_step(
         if len(images) > 0:
             image = np.concatenate(images, axis=0)
             step_dict["image"] = image
-        step_dict["language"] = utils.tokenize_language((step["language_instruction"]), per_token=True)
+        # step_dict["language"] = utils.tokenize_language((step["language_instruction"]), per_token=True)
+        if fix_language_embedding is not None:
+            step_dict["language"] = fix_language_embedding
+        else:
+            step_dict["language"] = utils.get_t5_embeddings(language, per_token=True, device="cuda")
 
     if "image" in step_dict:
         step_dict["image"] = step_dict["image"].astype("float32")
