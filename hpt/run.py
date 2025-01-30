@@ -3,6 +3,7 @@
 # --------------------------------------------------------
 
 import os
+import sys
 import hydra
 import torch
 from torch.utils import data
@@ -60,6 +61,11 @@ def init_policy(cfg, dataset, domain, device):
     utils.update_network_dim(cfg, dataset, policy)
     policy.init_domain_stem(domain, cfg.stem)
     normalizer = dataset.get_normalizer(mode='gaussian') # TODO: original is default ('limits')
+    # os.makedirs(cfg.output_dir + '_norm', exist_ok=True)
+    # torch.save(normalizer.state_dict(), os.path.join(cfg.output_dir + '_norm', "normalizer_state_dict.pth"))
+    # print(normalizer.state_dict())
+    # print('----SAVE SUCCESS!-----')
+    # sys.exit()
     policy.init_domain_head(domain, normalizer, cfg.head)
 
     # add encoders into policy parameters. enable end-to-end training of the viison model for instance.
