@@ -250,8 +250,8 @@ class Policy(nn.Module):
             if modality not in data:
                 continue
             
-            if 'state' in modality:
-                print('---STATE SHAPE---', data[modality].shape)
+            # if 'state' in modality:
+            #     print('---STATE SHAPE---', data[modality].shape)
             
             use_raw_image = "image" in modality and "image" in self.encoders
             if use_raw_image:  # finetuning with encoders

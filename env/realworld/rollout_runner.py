@@ -89,8 +89,19 @@ def convert_dataset_image(dataset_dir, task_name='toy_collection', action_name=[
             image_dict = dict()
             for cam_name in camera_names:
                 if 'left' in cam_name or 'right' in cam_name:
+                #     base_cam_name = cam_name.split('_')[0]
+                #     full_image = root[f'/observations/images/{base_cam_name}'][()]
+                #     w  = full_image.shape[2] // 2
+                #     if 'left' in cam_name:
+                #         image_dict[cam_name] = full_image[:, :, :w, :]
+                #     elif 'right' in cam_name:
+                #         image_dict[cam_name] = full_image[:, :, w:, :]
+                # else:
+                #     image_dict[cam_name] = root[f'/observations/images/{cam_name}'][()]
                     cam_name = cam_name.split('_')[0]
-                image_dict[cam_name] = root[f'/observations/images/{cam_name}'][()]
+                    image_dict[cam_name] = root[f'/observations/images/{cam_name}'][()]
+                else:
+                    image_dict[cam_name] = root[f'/observations/images/{cam_name}'][()]
                 
             lang = task_name
             steps = []

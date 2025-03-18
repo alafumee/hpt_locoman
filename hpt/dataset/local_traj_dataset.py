@@ -109,6 +109,10 @@ def process_dataset_step(
                 step_dict["language"] = utils.get_t5_embeddings(language, per_token=True, device="cuda")
             image_embeddings = []
             for image in images:
+                # # Save image as jpg
+                # img_path = os.path.join("images", f"image.jpg")
+                # cv2.imwrite(img_path, image)
+
                 image_embeddings.append(
                     utils.get_image_embeddings(image, image_encoder, downsample=use_ds) #, device="cpu")
                 )

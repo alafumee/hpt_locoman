@@ -26,7 +26,7 @@ CMD="CUDA_VISIBLE_DEVICES=7 HYDRA_FULL_ERROR=1 time python -m hpt.run  \
 		train.pretrained_dir=output/$PRETRAINED  \
 		dataset.episode_cnt=100 \
 		train.freeze_trunk=False \
-		domains=train_toy_collect_locoman_${size} \
+		domains=train_toy_collect_locoman_bimanual_${size} \
 		output_dir=output/${DATE}_${PRETRAINEDCMD} \
 		$ADD_ARGUMENT"
 
