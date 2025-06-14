@@ -1,4 +1,5 @@
 # from scratch
+# provide a placeholder e.g. 'none' to train from scratch
 bash ./train_example.sh none desired_savedir_name dataset_name 1
 
 # finetune

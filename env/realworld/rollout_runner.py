@@ -13,6 +13,7 @@ from collections import OrderedDict
 RESOLUTION = (480, 480)
 
 def find_all_hdf5(dataset_dir, skip_mirrored_data):
+    dataset_dir = os.path.expanduser(dataset_dir)
     if not os.path.exists(dataset_dir):
         print(f"Directory {dataset_dir} does not exist.")
         return []

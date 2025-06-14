@@ -119,3 +119,9 @@ If you have any questions, feel free to contact me through email (liruiw@mit.edu
 ![](doc/framework.png)
 
 
+## Usage for LocoMan:
+
+Prepare your datasets in the same format in our main repo and update the dataset name and save directory in `run_train_script.sh`. The script will look for a dataset directory at `~/Human2LocoMan/demonstrations/${dataset_name}`， while the results will be saved at `output/${DATE}_${save_dir}`. If you wish, you can change these by modifying `dataset_generator_func.dataset_dir` in `locoman.yaml`, and `output_dir` in `experiments/scripts/locoman/train_example.sh`. Then you can execute the script to train the model. 
+
+You can adjust the parameters as needed in `experiments/scripts/locoman/train_example.sh`.
+

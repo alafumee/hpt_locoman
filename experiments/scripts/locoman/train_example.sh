@@ -36,5 +36,3 @@ CMD="CUDA_VISIBLE_DEVICES=0 HYDRA_FULL_ERROR=1 time python -m hpt.run  \
 		$ADD_ARGUMENT"
 
 eval $CMD
-
-# the loaded dataset path would be 

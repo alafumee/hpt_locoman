@@ -1,1 +1,0 @@
-bash /home/yunzhe/HPT/experiments/scripts/real_toy_collection/pour/train_human_pour.sh none pour_human_pretrain_fiximage_cs180 1 0.0143

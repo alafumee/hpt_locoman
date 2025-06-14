@@ -1,2 +1,0 @@
-bash /home/yunzhe/HPT/experiments/scripts/real_toy_collection/scoop/train_locoman_from_scratch_scoop.sh none scoop_locoman_from_scratch_fiximage_cs120 1 small 0.167
-bash /home/yunzhe/HPT/experiments/scripts/real_toy_collection/scoop/train_locoman_from_scratch_scoop.sh none scoop_locoman_from_scratch_fiximage_cs120 1 mid 0.091

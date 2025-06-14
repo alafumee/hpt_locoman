@@ -1,1 +1,0 @@
-bash /home/yunzhe/HPT/experiments/scripts/real_toy_collection/scoop/train_locoman_from_scratch_scoop.sh 11_04_2025_17_22_27_2619812_scoop_human_pretrain scoop_locoman_finetune_small_fiximage 1 small 0.167
