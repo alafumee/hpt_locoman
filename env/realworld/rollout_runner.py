@@ -12,38 +12,6 @@ from collections import OrderedDict
 
 RESOLUTION = (480, 480)
 
-# define your own dataset conversion
-# def convert_dataset_image(dataset_dir="realworld_data", env_names=None, gui=False, episode_num_pertask=5000):
-#     # convert to a list of episodes that can be added to replay buffer
-#     for env_name in env_names:
-#         data = dict(np.load(f"data/realworld_data/{env_name}/demo_state.npz", allow_pickle=True))
-#         traj_end_indexes = np.where(data["done"])[0]
-#         prev_traj_end_idx = 0
-
-#         for traj_idx, traj_end_idx in tqdm(enumerate(traj_end_indexes[:episode_num_pertask])):
-
-#             action = data["action"][prev_traj_end_idx:traj_end_idx].astype(np.float32)  # remove fingers
-#             image = data["image"][prev_traj_end_idx:traj_end_idx, ..., :3].astype(np.float32)
-#             image2 = data["image2"][prev_traj_end_idx:traj_end_idx, ..., :3].astype(np.float32)
-#             ee_pose = data["ee_pose"][prev_traj_end_idx:traj_end_idx].astype(np.float32)
-#             state = ee_pose
-
-#             # append the action
-#             lang = data["task_name"][0]
-#             steps = []
-#             for a, o1, o2, s in zip(action, image, image2, state):
-#                 # break into step dict
-#                 step = {
-#                     "observation": {"image": o1, "image2": o2, "state": s},
-#                     "action": a,
-#                     "language_instruction": lang,
-#                 }
-#                 steps.append(OrderedDict(step))
-
-#             data_dict = {"steps": steps}
-#             prev_traj_end_idx = traj_end_idx
-#             yield data_dict
-
 def find_all_hdf5(dataset_dir, skip_mirrored_data):
     if not os.path.exists(dataset_dir):
         print(f"Directory {dataset_dir} does not exist.")
@@ -89,19 +57,20 @@ def convert_dataset_image(dataset_dir, task_name='toy_collection', action_name=[
             image_dict = dict()
             for cam_name in camera_names:
                 if 'left' in cam_name or 'right' in cam_name:
-                #     base_cam_name = cam_name.split('_')[0]
-                #     full_image = root[f'/observations/images/{base_cam_name}'][()]
-                #     w  = full_image.shape[2] // 2
-                #     if 'left' in cam_name:
-                #         image_dict[cam_name] = full_image[:, :, :w, :]
-                #     elif 'right' in cam_name:
-                #         image_dict[cam_name] = full_image[:, :, w:, :]
-                # else:
-                #     image_dict[cam_name] = root[f'/observations/images/{cam_name}'][()]
-                    cam_name = cam_name.split('_')[0]
-                    image_dict[cam_name] = root[f'/observations/images/{cam_name}'][()]
+                    base_cam_name = cam_name.split('_')[0]
+                    full_image = root[f'/observations/images/{base_cam_name}'][()]
+                    w  = full_image.shape[2] // 2
+                    if 'left' in cam_name:
+                        image_dict[cam_name] = full_image[:, :, :w, :]
+                    elif 'right' in cam_name:
+                        image_dict[cam_name] = full_image[:, :, w:, :]
                 else:
                     image_dict[cam_name] = root[f'/observations/images/{cam_name}'][()]
+                
+                    # cam_name = cam_name.split('_')[0]
+                    # image_dict[cam_name] = root[f'/observations/images/{cam_name}'][()]
+                # else:
+                #     image_dict[cam_name] = root[f'/observations/images/{cam_name}'][()]
                 
             lang = task_name
             steps = []

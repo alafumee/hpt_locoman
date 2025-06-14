@@ -121,6 +121,7 @@ def run(cfg):
 
     # init policy
     policy = init_policy(cfg, dataset, domain, device)
+    print('DOMAIN', domain)
     
     print("total num of parameters: ", sum(p.numel() for p in policy.parameters() if p.requires_grad))
     print("trunk parameters: ", sum(p.numel() for p in policy.trunk.parameters() if p.requires_grad))
@@ -167,4 +168,5 @@ def run(cfg):
 
 
 if __name__ == "__main__":
+    torch.set_num_threads(4)
     run()

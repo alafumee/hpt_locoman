@@ -1,0 +1,1 @@
+bash /home/yunzhe/HPT/experiments/scripts/real_toy_collection/scoop/train_human_scoop.sh none scoop_human_pretrain_fiximage_cs120 1 0.0589

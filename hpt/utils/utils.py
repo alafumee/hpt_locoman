@@ -128,7 +128,7 @@ def get_optimizer(
     trunk_params = [v for k, v in policy.named_parameters() if "trunk" in k]
     nontrunk_params = [v for k, v in policy.named_parameters() if "trunk" not in k]
     params = [
-        {"params": trunk_params},
+        {"params": trunk_params, "lr": optimizer_spec.lr},
         {"params": nontrunk_params, "lr": optimizer_spec.lr * optimizer_extra.nontrunk_lr_scale},
     ]
 

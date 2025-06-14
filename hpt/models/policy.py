@@ -312,6 +312,7 @@ class Policy(nn.Module):
 
         # head pass
         loss = self.heads[domain].compute_loss(features, data)
+        data["action"] = self.normalizer[domain]["action"].unnormalize(data["action"])
         return loss
 
     def forward(self, domain: str, data: dict):
@@ -326,6 +327,8 @@ class Policy(nn.Module):
 
         # head pass
         action = self.heads[domain](features)
+        
+        # print("normalized action in forward:", action[0][:20].cpu().detach().numpy().tolist())
 
         # postprocess. unnormalize the outputs
         action = self.postprocess_actions(domain, action)
@@ -381,6 +384,8 @@ class Policy(nn.Module):
                 print("loaded model keys:", loaded_model.keys())
                 loaded_trunk = {k[6:]: v for k, v in loaded_model.items() if k[:6] == 'trunk.'} # trunk.trunk.abc->trunk.abc
                 self.trunk.load_state_dict(loaded_trunk, strict=True)
+                # load whole model
+                # self.load_state_dict(loaded_model, strict=True)
             else:
                 self.trunk.load_state_dict(torch.load(path), strict=True)
 

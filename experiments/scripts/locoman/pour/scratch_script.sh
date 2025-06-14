@@ -1,0 +1,2 @@
+bash /home/yunzhe/HPT/experiments/scripts/real_toy_collection/pour/train_locoman_from_scratch_pour.sh none pour_locoman_from_scratch_fiximage_cs180_30trajs 1 small 0.0323
+bash /home/yunzhe/HPT/experiments/scripts/real_toy_collection/pour/train_locoman_from_scratch_pour.sh none pour_locoman_from_scratch_fiximage_cs180_60trajs 1 full 0.0164

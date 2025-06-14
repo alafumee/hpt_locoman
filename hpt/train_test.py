@@ -1,6 +1,7 @@
 # --------------------------------------------------------
 # Licensed under The MIT License [see LICENSE for details]
 # --------------------------------------------------------
+import copy
 import time
 
 import numpy as np
@@ -89,7 +90,8 @@ def train(
         batch["data"] = dict_apply(batch["data"], lambda x: x.to(device, non_blocking=True).float())
         data_time = time.time() - start_time
         start_time = time.time()
-        domain_loss = model.compute_loss(batch)
+        copy_batch = copy.deepcopy(batch)
+        domain_loss = model.compute_loss(copy_batch)
         optimizer.zero_grad()
         domain_loss.backward()
 
@@ -103,7 +105,7 @@ def train(
                 domain_loss, model, optimizer, step_time, data_time, epoch)
 
         pbar.set_description(
-            f"Epoch: {epoch} {train_step} Step: {batch_idx}/{epoch_size} Time: {step_time:.3f}"
+            f"Epoch: {epoch} {train_step} Step: {batch_idx}/{epoch_size} Time: {step_time:.3f} lr: {optimizer.param_groups[0]['lr']:.6f} "
             f"{data_time:.3f} Loss: {info_log[batch['domain'][0] + '_loss'][-1]:.3f} Grad: {info_log['max_gradient'][-1]:.3f}"
         )
 
