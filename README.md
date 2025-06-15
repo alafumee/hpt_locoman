@@ -1,3 +1,64 @@
+# HPT Usage for LocoMan:
+1. Install HPT dependencies following [the instructions](#️-setup)
+
+2. Prepare your datasets in the same format in our main repo and update the dataset name and save directory in `run_train_script.sh`. The script will look for a dataset directory at `~/Human2LocoMan/demonstrations/${dataset_name}`， while the results will be saved at `output/${DATE}_${save_dir}`. If you wish, you can change these by modifying `dataset_generator_func.dataset_dir` in `locoman.yaml`, and `output_dir` in `experiments/scripts/locoman/train_example.sh`. Then you can execute the script to train the model. 
+
+```bash
+# from scratch
+# provide a placeholder e.g. 'none' to train from scratch
+bash ./train_example.sh none desired_savedir_name dataset_name 1
+
+# finetune
+bash ./train_example.sh pretrained_dir_name desired_savedir_name dataset_name 1
+```
+
+You can adjust the parameters as needed in `experiments/scripts/locoman/train_example.sh`.
+
+```bash
+set -x
+set -e
+DATE="`date +'%d_%m_%Y_%H_%M_%S'`_$$" 
+STAT_DIR=${0}
+STAT_DIR="${STAT_DIR##*/}"
+STAT_DIR="${STAT_DIR%.sh}"
+
+echo "RUNNING $STAT_DIR!"
+PRETRAINED=${1}
+PRETRAINEDCMD=${2}
+NUM_RUN=${4-"1"}
+DATASET_NAME=${3-"locoman"}
+
+
+# train
+ADD_ARGUMENT=${5-""}
+
+# Loop through the arguments starting from the 5th
+for arg in "${@:6}"; do
+  ADD_ARGUMENT+=" $arg"  # Concatenate each argument
+done
+
+
+CMD="CUDA_VISIBLE_DEVICES=0 HYDRA_FULL_ERROR=1 time python -m hpt.run  \
+		script_name=$STAT_DIR \
+		env=locoman  \
+		train.pretrained_dir=output/$PRETRAINED  \
+		dataset.episode_cnt=100 \
+		train.total_iters=160000 \
+		dataloader.batch_size=32 \
+		val_dataloader.batch_size=32 \
+		optimizer.lr=1e-4 \
+		train.freeze_trunk=False \
+		domains=${DATASET_NAME} \
+		output_dir=output/${DATE}_${PRETRAINEDCMD} \
+		$ADD_ARGUMENT"
+
+eval $CMD
+```
+
+For more information, you may refer to the original instructions [here](https://github.com/liruiw/HPT) or below. You should be able to train on LocoMan datasets with the above instructions and not worry about the original usage instructions.
+<hr style="border: 2px solid gray;"></hr>
+
+
 # 🦾 Heterogenous Pre-trained Transformers
 [![HF Models](https://img.shields.io/badge/%F0%9F%A4%97-Models-yellow?style=flat-square)](https://huggingface.co/liruiw/hpt-base)
 [![License](https://img.shields.io/badge/License-MIT-blue.svg?style=flat-square)](LICENSE)
@@ -16,10 +77,6 @@ Neural Information Processing Systems (Spotlight), 2024
 
 
 This is a pytorch implementation for pre-training Heterogenous Pre-trained Transformers (HPTs). The pre-training procedure train on mixture of embodiment datasets with a supervised learning objective. The pre-training process can take some time, so we also provide pre-trained checkpoints below. You can find more details on our [project page](https://liruiw.github.io/hpt). An alternative clean implementation of HPT in Hugging Face can also be found [here](https://github.com/liruiw/lerobot/).
-
-
-**TL;DR:** HPT aligns different embodiment to a shared latent space and investigates the scaling behaviors in policy learning. Put a scalable transformer in the middle of your policy and don’t train from scratch!
-
 
 
 
@@ -50,18 +107,7 @@ export MUJOCO_GL=egl
 1. ```python -m hpt.run``` train policies on each environment. Add `+mode=debug`  for debugging.
 2. ```bash experiments/scripts/metaworld/train_test_metaworld_1task.sh test test 1 +mode=debug``` for example script.
 3. Change ``train.pretrained_dir`` for loading pre-trained trunk transformer. The model can be loaded either from local checkpoint folder or huggingface [repository](https://huggingface.co/liruiw/hpt-xlarge).
-4. Run the following scripts for mujoco experiments.
 
-<details>
-  <summary><span style="font-weight: bold;">Metaworld 20 Task Experiments</span></summary>
-
-```
-bash experiments/scripts/metaworld/train_test_metaworld_20task_finetune.sh hf://liruiw/hpt-base
-```
-5. See [here](experiments/config/config.yaml) for defining and modifying the hyperparameters.
-6. We use [wandb](https://wandb.ai/home) to log the training process.
-
-</details>
 
 ## 🤖 Try this On Your Own Dataset
 0. For training, it requires a dataset conversion  `convert_dataset` function for packing your own datasets. Check [this](env/realworld) for example.
@@ -69,16 +115,6 @@ bash experiments/scripts/metaworld/train_test_metaworld_20task_finetune.sh hf://
 2. If needed, modify the [config](experiments/configs/config.yaml) for changing the perception stem networks and action head networks in the models. Take a look at [`realrobot_image.yaml`](experiments/configs/env/realrobot_image.yaml) for example script in the real world.
 3. Add `dataset.use_disk=True` for saving and loading the dataset in disk.
 
-## 💽 Checkpoints
-You can find pretrained HPT checkpoints here. At the moment we provide the following model versions:
-
-| Model                                                                  |   Size         |
-|--------------------------------------------------------------------------------|----------------|
-| [HPT-XLarge](https://huggingface.co/liruiw/hpt-xlarge)                 |  226.8M Params  |
-| [HPT-Large](https://huggingface.co/liruiw/hpt-large)                 |  50.5M Params  |
-| [HPT-Base](https://huggingface.co/liruiw/hpt-base)                 |  12.6M Params  |
-| [HPT-Small](https://huggingface.co/liruiw/hpt-small)                 |  3.1M Params   |
-| [HPT-Base (With Language)](https://huggingface.co/liruiw/hpt-base-lang)       |  50.6M Params  |
 
 
 ---
@@ -110,18 +146,4 @@ booktitle = {Neurips},
 year      = {2024}
 }
 ```
-
-
-## Contact
-
-If you have any questions, feel free to contact me through email (liruiw@mit.edu). Enjoy!
-
-![](doc/framework.png)
-
-
-## Usage for LocoMan:
-
-Prepare your datasets in the same format in our main repo and update the dataset name and save directory in `run_train_script.sh`. The script will look for a dataset directory at `~/Human2LocoMan/demonstrations/${dataset_name}`， while the results will be saved at `output/${DATE}_${save_dir}`. If you wish, you can change these by modifying `dataset_generator_func.dataset_dir` in `locoman.yaml`, and `output_dir` in `experiments/scripts/locoman/train_example.sh`. Then you can execute the script to train the model. 
-
-You can adjust the parameters as needed in `experiments/scripts/locoman/train_example.sh`.
 
